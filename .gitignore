@@ -1,0 +1,20 @@
+# General
+*.log
+*.zip
+__pycache__
+
+# Data
+# gregobase_online.sql
+gabc
+csv
+_tmp*/
+
+
+# Documentation
+docs/_build
+
+# Development
+*-env
+tmp
+.vscode
+.python-version
