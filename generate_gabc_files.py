@@ -61,6 +61,7 @@ def collect_metadata(idx, chants, chant_tags, chant_sources, sources, tags):
     - ``office-part``
     - ``mode``
     - ``transcriber``
+    - ``license`` (non-standard; always CC0 for GregoBase)
 
     Besides this, we collect all sources and tags associated with a chant. 
     Those gregobase-specific meta-fields all start with the `_gregobase` prefix:
@@ -83,6 +84,7 @@ def collect_metadata(idx, chants, chant_tags, chant_sources, sources, tags):
         'office-part': chant['office-part'],
         'mode': chant['mode'],
         'transcriber': chant['transcriber'],
+        'licence': 'CC0',
         '_gregobase_url': f'https://gregobase.selapa.net/chant.php?id={idx}',
         '_gregobase_id': idx,
         '_gregocorpus_version': __version__,

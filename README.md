@@ -1,5 +1,5 @@
-GregoCorpus
-===========
+GregoBase Corpus
+================
 
 A corpus of Gregorian Chant extracted from GregoBase.
 
