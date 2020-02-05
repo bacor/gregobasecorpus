@@ -3,7 +3,7 @@
 import pandas as pd
 import json
 import warnings
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 
 def extract_gabc_body(chant):
     """Extract the gabc body of a chant from the chants table
@@ -87,7 +87,7 @@ def collect_metadata(idx, chants, chant_tags, chant_sources, sources, tags):
         'licence': 'CC0',
         '_gregobase_url': f'https://gregobase.selapa.net/chant.php?id={idx}',
         '_gregobase_id': idx,
-        '_gregocorpus_version': __version__,
+        '_gregobase_corpus_version': __version__,
     }
     if not pd.isnull(chant['commentary']):
         metadata['commentary'] = chant['commentary']
