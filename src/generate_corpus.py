@@ -37,7 +37,7 @@ def random_id(length=5):
     chars = 'abcdefghijklmnopqrstuvwxyz1234567890'
     return ''.join(random.choice(chars) for _ in range(length))
 
-def compress_distribution(remove_dir=False):
+def compress_output(remove_dir=False):
     archive_fn = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
     shutil.make_archive(archive_fn, 'zip', OUTPUT_DIR)
     if remove_dir:
@@ -402,7 +402,7 @@ def main():
     gabc.convert()
     writer = ReadmeWriter()
     writer.write_readme(gregobase_export_date=args.date)
-    compress_distribution()
+    compress_output()
 
 if __name__ == '__main__':
     main()
