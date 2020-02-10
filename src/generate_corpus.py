@@ -4,201 +4,39 @@ import subprocess
 import os
 import pandas as pd
 import shutil
+import json
+import datetime
 
-__version__ = '0.1.1'
+# GregoBase Corpus version
+__version__ = '0.4'
 
-"""Structure of the Gregobase MySQL database"""
-db_structure = {
-    'chant_tags': {
-        'description': 'Lists the tags associated to each chant. So a certain\
-                        chant_id might occur multiple times, once for each of\
-                        its tags.',
-        'columns': [
-            {
-                'name': 'chant_id',
-                'dtype': int,
-                'description': 'ID of a chant'
-            },
-            {
-                'name': 'tag_id',
-                'dtype': int,
-                'description': 'ID of a tag'
-            }
-        ]
-    },
+# Directories
+SRC_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.abspath(os.path.join(SRC_DIR, os.path.pardir))
+DIST_DIR = os.path.join(ROOT_DIR, 'dist')
+OUTPUT_DIR = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
+CSV_DIR = os.path.join(OUTPUT_DIR, 'csv')
+GABC_DIR = os.path.join(OUTPUT_DIR, 'gabc')
 
-    'chants': {
-        'description': 'Table of chants with all their properties.',
-        'columns': [
-            {
-                'name': 'id',
-                'dtype': int,
-                'description': 'unique id of a chant'
-            },
-            { 
-                'name': 'cantus_id',
-                'dtype': str,
-                'description': 'Cantus_id of the chant'
-            },
-            {
-                'name': 'version',
-                'dtype': str,
-                'description': 'Which version of the chant, e.g. according to \
-                                which source?'
-            },
-            {
-                'name': 'incipit',
-                'dtype': str,
-                'description': 'Textual incipit'
-            },
-            {
-                'name': 'initial',
-                'dtype': int,
-                'description': '?'
-            },
-            {
-                'name': 'office-part',
-                'dtype': str,
-                'description': 'Usage or office part.'
-            },
-            {
-                'name': 'mode',
-                'dtype': str,
-                'description': 'Mode of the chant.'
-            },
-            {
-                'name': 'mode_var',
-                'dtype': str,
-                'description': 'Not sure; this field appears under the usage in the PDF.'
-            },
-            {
-                'name': 'transcriber',
-                'dtype': str,
-                'description': 'Who transcribed the chant.'
-            },
-            {
-            'name': 'commentary',
-            'dtype': str,
-            'description': 'Appears right above the chant in the PDF.'
-            },
-            {
-                'name': 'gabc',
-                'dtype': str,
-                'description': 'The GABC code of the chant.'
-            },
-            {
-                'name': 'gabc_verses',
-                'dtype': str,
-                'description': 'GABC of the other verses (same melody, different text)'
-            },
-            {
-                'name': 'tex_verses',
-                'dtype': str,
-                'description': 'LaTeX code of the other verses, where the place of\
-                                melodic inflections are indicated in by bold and\
-                                italic syllables.'
-            },
-            {
-                'name': 'remarks',
-                'dtype': str,
-                'description': 'Remarks about for example the transcription.'
-            }
-        ]
-    },
+# Load database structure
+db_structure_fn = os.path.join(SRC_DIR, 'db_structure.json')
+with open(db_structure_fn, 'r') as handle:
+    DB_STRUCTURE = json.load(handle)
 
-    'tags': {
-        'description': 'Tag names',
-        'columns': [
-            {
-                'name': 'id',
-                'dtype': int,
-                'description': 'ID of the tag',
-            },
-            {
-                'name': 'tag',
-                'dtype': str,
-                'description': 'Name of the tag'
-            }
-        ]
-    },
-  
-    'sources': {
-        'description': '',
-        'columns': [
-            {
-                'name': 'id',
-                'dtype': int,
-                'description': 'ID of the source'
-            },
-            {
-                'name': 'year',
-                'dtype': int,
-                'description': 'Year of publication (?) of the source'
-            },
-            {
-                'name': 'editor',
-                'dtype': str,
-                'description': 'Editor of the source'
-            },
-            {
-                'name': 'title',
-                'dtype': str,
-                'description': 'Title'
-            },
-            {
-                'name': 'description',
-                'dtype': str,
-                'description': 'Description of the source'
-            },
-            {
-                'name': 'caption',
-                'dtype': str,
-                'description': 'Caption (usually with credits) shown above the source images.'
-            },
-            {
-                'name': 'pages',
-                'dtype': str,
-                'description': 'List of pages in the source'
-            }
-        ]
-    },
+##
 
-    'chant_sources': {
-        'description': 'Table links chants to sources',
-        'columns': [
-            {
-                'name': 'chant_id',
-                'dtype': int,
-                'description': 'ID of the chant'
-            },
-            {
-                'name': 'source',
-                'dtype': int,
-                'description': 'ID of the source'
-            },
-            {
-                'name': 'page_id',
-                'dtype': str,
-                'description': 'Page id. Can be a page number or e.g. `[125], 125**`'
-            },
-            {
-                'name': 'sequence',
-                'dtype': int,
-                'description': '???'
-            },
-            {
-                'name': 'extent',
-                'dtype': int,
-                'description': 'The number of pages the chant spans.'
-            }
-        ]
-    }
-}
-
-def randomId(length=5):
+def random_id(length=5):
     """Return a random alphanumeric string of a given length"""
     chars = 'abcdefghijklmnopqrstuvwxyz1234567890'
     return ''.join(random.choice(chars) for _ in range(length))
+
+def compress_distribution(remove_dir=False):
+    archive_fn = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
+    shutil.make_archive(archive_fn, 'zip', OUTPUT_DIR)
+    if remove_dir:
+        shutil.rmtree(OUTPUT_DIR)
+
+##
 
 class GregoBaseConverter(object):
 
@@ -206,27 +44,24 @@ class GregoBaseConverter(object):
     """str: delimiter used in the temporary csv file"""
     
     def __init__(self, db_host='localhost', db_user='root', db_pass='',
-        db_prefix='gregobase_', db_structure=db_structure):
+        db_prefix='gregobase_', db_structure=DB_STRUCTURE):
         
         # Initialize database
         self.db_host = db_host
         self.db_user = db_user
         self.db_pass = db_pass
         self.db_prefix = db_prefix
-        self.db_name = f'tmp_db_gregocorpus_{randomId()}'
+        self.db_name = f'tmp_db_gregocorpus_{random_id()}'
         self.db = pymysql.connect(host=db_host, user=db_user, password=db_pass)
         self.cursor = self.db.cursor()
 
         # Set up directories
-        output_dir = os.path.join('dist', f'gregobasecorpus-v{__version__}')
-        self.output_dir = os.path.abspath(output_dir)
-        self.csv_dir = os.path.join(self.output_dir, 'csv')
-        self.tmp_dir = os.path.join(self.output_dir, 'tmp')
+        self.tmp_dir = os.path.join(OUTPUT_DIR, 'tmp')
 
         # Clear 
-        if os.path.exists(self.output_dir):
-            shutil.rmtree(self.output_dir)
-        for dir_path in [self.csv_dir, self.tmp_dir]:
+        if os.path.exists(OUTPUT_DIR):
+            shutil.rmtree(OUTPUT_DIR)
+        for dir_path in [CSV_DIR, self.tmp_dir]:
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
 
@@ -265,9 +100,10 @@ class GregoBaseConverter(object):
             self.cursor.execute(statement)
             
             # Post process and convert to final csv file
-            structure = self.db_structure[table_name]
-            columns = structure['columns']
-            dtypes = { col['name']: col['dtype'] for col in columns }
+            columns = self.db_structure[table_name]
+            dtypes = {}
+            dtype_map = { 'str': str, 'int': int }
+            dtypes = { col['name']: dtype_map[col['dtype']] for col in columns }
             names = [ col['name'] for col in columns ]
             df = pd.read_csv(tmp_filepath,
                             names=names, 
@@ -279,48 +115,11 @@ class GregoBaseConverter(object):
                             index_col=0,
                             engine='python')
 
-            target_fn = os.path.join(self.csv_dir, f'{table_name}.csv')
+            target_fn = os.path.join(CSV_DIR, f'{table_name}.csv')
             df.to_csv(target_fn)
 
         # Remove temporary directory
         shutil.rmtree(self.tmp_dir)
-
-    def export_db_structure(self, filename='database_structure.md'):
-        """Generate a markdown summary of the database structure
-        
-        Generate a markdown file summarizing the structure of the database: which
-        tables it contains, what columns they have and what values they take. All 
-        this is specified in the variable `db_structure`.
-        
-        Args:
-            filename (str): the filename
-        """
-        filepath = os.path.join(self.output_dir, filename)
-
-        with open(filepath, 'w') as handle:
-            # Header
-            header = (
-                "Structure of GregoBase Corpus v{version}\n"
-                "====================================\n"
-                "\n"
-                "*Note: This file is automatically generated.*\n\n")
-            handle.write(header.format(version=__version__))
-            
-            for table, structure in self.db_structure.items():
-                title = f'Table `{table}.csv`'
-                handle.write(f'{title}\n')
-                handle.write('-' * len(title) + '\n')
-                handle.write(f'{structure["description"]}\n\n')
-
-                handle.write('| Column | Type | Description |\n')
-                handle.write('|--|--|--|--|\n')
-                for column in structure['columns']:
-                    name = column['name']
-                    dtype = 'int' if column['dtype'] == int else 'str'
-                    desc = column['description']
-                    handle.write(f'| {name} | {dtype} | {desc} |\n')
-
-                handle.write('\n\n')
 
     def convert(self, filepath):
         """Convert a sql dump of GregoBase into a set of CSV files
@@ -332,34 +131,30 @@ class GregoBaseConverter(object):
         self.import_sql(filepath)
         self.export_tables()
         self.delete_db()
-        self.export_db_structure()
+
+##
 
 class GABCConverter(object):
-    def __init__(self, db_structure=db_structure):
+    def __init__(self, db_structure=DB_STRUCTURE):
         """"""
         self.db_structure = db_structure
 
         # Set up output directories
-        output_dir = os.path.join('dist', f'gregobasecorpus-v{__version__}')
-        self.output_dir = os.path.abspath(output_dir)
-        self.gabc_dir = os.path.join(self.output_dir, 'gabc')
-        if not os.path.exists(self.gabc_dir):
-            os.makedirs(self.gabc_dir)
-
-        self.csv_dir = os.path.join(self.output_dir, 'csv')
-        if not os.path.exists(self.csv_dir):
+        if not os.path.exists(GABC_DIR):
+            os.makedirs(GABC_DIR)
+        if not os.path.exists(CSV_DIR):
             raise Exception('CSV directory not found')
 
         # Load all csv files
-        chants_fn = os.path.join(self.csv_dir, 'chants.csv')
+        chants_fn = os.path.join(CSV_DIR, 'chants.csv')
         self.chants = pd.read_csv(chants_fn, index_col=0) 
-        chant_sources_fn = os.path.join(self.csv_dir, 'chant_sources.csv')
+        chant_sources_fn = os.path.join(CSV_DIR, 'chant_sources.csv')
         self.chant_sources = pd.read_csv(chant_sources_fn, index_col=0)
-        chant_tags_fn = os.path.join(self.csv_dir, 'chant_tags.csv')
+        chant_tags_fn = os.path.join(CSV_DIR, 'chant_tags.csv')
         self.chant_tags = pd.read_csv(chant_tags_fn, index_col=0)
-        sources_fn = os.path.join(self.csv_dir, 'sources.csv')
+        sources_fn = os.path.join(CSV_DIR, 'sources.csv')
         self.sources = pd.read_csv(sources_fn, index_col=0)
-        tags_fn = os.path.join(self.csv_dir, 'tags.csv')
+        tags_fn = os.path.join(CSV_DIR, 'tags.csv')
         self.tags = pd.read_csv(tags_fn, index_col=0)
 
     def extract_gabc_body(self, idx):
@@ -416,7 +211,7 @@ class GABCConverter(object):
         The standard GABC fields are:
 
         - ``name``
-        - ``office-part``
+        - ``office_part``
         - ``mode``
         - ``transcriber``
         - ``license`` (non-standard; always CC0 for GregoBase)
@@ -426,7 +221,7 @@ class GABCConverter(object):
 
         - ``_gregobase_id``: the id of the chant
         - ``_gregobase_url``: the gregobase webpage for the chant
-        - ``_gregocorpus_version`: version of the converter
+        - ``_gregobase_corpus_version`: version of the converter
         - ``_gregobase_sources``: a comma-separated list of source ids for sources 
             the chant appears in.
         - ``_gregobase_source_{i}_id``: the id of the i-th source
@@ -436,19 +231,29 @@ class GABCConverter(object):
         - ``_gregobase_tag_{i}_id``: the id of the i-th tag
         - ``_gregobase_tag_{i}_name``: the name of the i-th tag
         """
+        
         chant = self.chants.loc[idx,:]
         metadata = {
             'name': chant['incipit'],
-            'office-part': chant['office-part'],
+            'office_part': chant['office_part'],
             'mode': chant['mode'],
             'transcriber': chant['transcriber'],
-            'licence': 'CC0',
+            'commentary': chant['commentary'],
+            'user-notes': chant['remarks'],
+            'gabc-copyright': 'CC0-1.0 <http://creativecommons.org/publicdomain/zero/1.0/>',
             '_gregobase_url': f'https://gregobase.selapa.net/chant.php?id={idx}',
             '_gregobase_id': idx,
             '_gregobase_corpus_version': __version__,
         }
+        
         if not pd.isnull(chant['commentary']):
             metadata['commentary'] = chant['commentary']
+        
+        if not pd.isnull(chant['cantus_id']):
+            metadata['_gregobase_cantus_id'] = chant['cantus_id']
+        
+        if not pd.isnull(chant['mode_var']):
+            metadata['_gregobase_mode_var'] = chant['mode_var']
 
         # Add data about all sources the chant is found in
         source_ids = self.chant_sources.query(f'chant_id=={idx}')['source']
@@ -487,12 +292,11 @@ class GABCConverter(object):
                 Defaults to 'gabc/{idx:0>5}.gabc'.
         """
         
-        for idx, chant in self.chants.head(5).iterrows():
-            print(idx)
+        for idx, chant in self.chants.iterrows():
             body = self.extract_gabc_body(idx)
             if body is not False:
                 metadata = self.collect_metadata(idx)
-                filepath = os.path.join(self.gabc_dir, filename.format(idx=idx))
+                filepath = os.path.join(GABC_DIR, filename.format(idx=idx))
 
                 with open(filepath, 'w') as handle:
                     for key, value in metadata.items():
@@ -501,13 +305,108 @@ class GABCConverter(object):
                     handle.write("%%\n")
                     handle.write(body)
 
-if __name__ == '__main__':
+##
+
+class ReadmeWriter(object):
+
+    def __init__(self, db_structure=DB_STRUCTURE):
+        """"""
+        self.db_structure = db_structure
+
+        # Set up output directories
+        OUTPUT_DIR = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
+        GABC_DIR = os.path.join(OUTPUT_DIR, 'gabc')
+        if not os.path.exists(GABC_DIR):
+            os.makedirs(GABC_DIR)
+
+        CSV_DIR = os.path.join(OUTPUT_DIR, 'csv')
+        if not os.path.exists(CSV_DIR):
+            raise Exception('CSV directory not found')
+
+        # Load all csv files
+        chants_fn = os.path.join(CSV_DIR, 'chants.csv')
+        self.chants = pd.read_csv(chants_fn, index_col=0) 
+        chant_sources_fn = os.path.join(CSV_DIR, 'chant_sources.csv')
+        self.chant_sources = pd.read_csv(chant_sources_fn, index_col=0)
+        chant_tags_fn = os.path.join(CSV_DIR, 'chant_tags.csv')
+        self.chant_tags = pd.read_csv(chant_tags_fn, index_col=0)
+        sources_fn = os.path.join(CSV_DIR, 'sources.csv')
+        self.sources = pd.read_csv(sources_fn, index_col=0)
+        tags_fn = os.path.join(CSV_DIR, 'tags.csv')
+        self.tags = pd.read_csv(tags_fn, index_col=0)
+
+    def table_structure(self, table_name):
+        lines = []
+        lines.append('| Column       | Type | Description                                        |')
+        lines.append('|--------------|------|----------------------------------------------------|')
+        for column in self.db_structure[table_name]:
+            name = column['name']
+            dtype = column['dtype']
+            description = column['description']
+            lines.append(f'| {name: <12} | {dtype: <4} | {description: <50} |')
+        return '\n'.join(lines)
+
+    def write_readme(self, gregobase_export_date="?"):
+        now = datetime.datetime.now()
+        corpus_date = now.strftime("%d %B %Y")
+        num_gabc_files = len([f for f in os.listdir(GABC_DIR) 
+            if os.path.isfile(os.path.join(GABC_DIR,f))])
+
+        template_kws = {
+            'version': __version__,
+            'chants_structure': self.table_structure('chants'),
+            'chant_sources_structure': self.table_structure('chant_sources'),
+            'chant_tags_structure': self.table_structure('chant_tags'),
+            'tags_structure': self.table_structure('tags'),
+            'sources_structure': self.table_structure('sources'),
+            'gregobase_export_date': gregobase_export_date,
+            'num_gabc_files': num_gabc_files,
+            'num_chants': len(self.chants),
+            'num_sources': len(self.sources),
+            'num_tags': len(self.tags),
+            'corpus_date': corpus_date
+        }
+
+        with open(os.path.join(SRC_DIR, 'readme_template.md'), 'r') as handle:
+            template = handle.read()
+            readme = template.format(**template_kws)
+        
+        readme_fn = os.path.join(OUTPUT_DIR, 'README.md')
+        with open(readme_fn, 'w') as handle:
+            handle.write(readme)
+
+##
+
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description='Generate the GregoBase Corpus.')
+    parser.add_argument('--sql', type=str,
+                        help='path the gregobase database dump')
+    parser.add_argument('--date', type=str,
+                        help='the date on which gregobase was exported (you can find this in the sql file)')   
+    args = parser.parse_args()
+
+
+
+    # Go!
     converter = GregoBaseConverter()
-    # converter.write_db_structure()
-    converter.convert('gregobase_online.sql')
+    converter.convert(filepath=args.sql)
+    gabc = GABCConverter()
+    gabc.convert()
+    writer = ReadmeWriter()
+    writer.write_readme(gregobase_export_date=args.date)
+    compress_distribution()
+
+if __name__ == '__main__':
+    main()
+    
+    # converter = GregoBaseConverter()
+    # converter.convert('../gregobase_dumps/gregobase_20191024.sql')
 
     # gabc = GABCConverter()
-    
-    # gabcConv.convert()
+    # gabc.convert()
+
+    # writer = ReadmeWriter()
+    # writer.write_readme()
 
     

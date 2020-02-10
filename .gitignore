@@ -1,13 +1,10 @@
 # General
 *.log
-*.zip
+.DS_Store
 __pycache__
 
 # Data
-# gregobase_online.sql
-gabc
-csv
-_tmp*/
+tmp
 dist/
 
 # Documentation

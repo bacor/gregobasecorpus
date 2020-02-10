@@ -1,0 +1,162 @@
+{
+    "chant_tags": [
+        {
+            "name": "chant_id",
+            "dtype": "str",
+            "description": "ID of a chant"
+        },
+        {
+            "name": "tag_id",
+            "dtype": "str",
+            "description": "ID of a tag"
+        }
+    ],
+    "chants": [
+        {
+            "name": "id",
+            "dtype": "int",
+            "description": "unique id of a chant (also used in naming the gabc files)"
+        },
+        { 
+            "name": "cantus_id",
+            "dtype": "str",
+            "description": "Cantus_id of the chant"
+        },
+        {
+            "name": "version",
+            "dtype": "str",
+            "description": "Sometimes a chant exists in different versions. The versions currently used are “Vatican” and “Solesmes” according to the presence of rhythmic signs"
+        },
+        {
+            "name": "incipit",
+            "dtype": "str",
+            "description": "Textual incipit"
+        },
+        {
+            "name": "initial",
+            "dtype": "int",
+            "description": "Whether to have a 1 or 2 lines initial or no initial at all"
+        },
+        {
+            "name": "office_part",
+            "dtype": "str",
+            "description": "Usage; also called office part."
+        },
+        {
+            "name": "mode",
+            "dtype": "str",
+            "description": "Mode of the chant. Should be a number or “p” for the “Tonus Peregrinus”."
+        },
+        {
+            "name": "mode_var",
+            "dtype": "str",
+            "description": "This field contains more mode information; presumably the ending, as the GregoBase site writes: 'the “ending” field is used to put the ending according to Solesmes classification.'"
+        },
+        {
+            "name": "transcriber",
+            "dtype": "str",
+            "description": "Who transcribed the chant."
+        },
+        {
+            "name": "commentary",
+            "dtype": "str",
+            "description": "Commentary that will be placed right above the chant in the PDF."
+        },
+        {
+            "name": "gabc",
+            "dtype": "str",
+            "description": "The GABC code of the chant."
+        },
+        {
+            "name": "gabc_verses",
+            "dtype": "str",
+            "description": "GABC of the other verses (same melody, different text)"
+        },
+        {
+            "name": "tex_verses",
+            "dtype": "str",
+            "description": "LaTeX code of the other verses, where the place of melodic inflections are indicated in by bold and italic syllables."
+        },
+        {
+            "name": "remarks",
+            "dtype": "str",
+            "description": "Remarks about for example the transcription."
+        }
+    ],
+    "tags": [
+        {
+            "name": "id",
+            "dtype": "int",
+            "description": "ID of the tag"
+        },
+        {
+            "name": "tag",
+            "dtype": "str",
+            "description": "Name of the tag"
+        }
+    ],
+    "sources": [
+        {
+            "name": "id",
+            "dtype": "int",
+            "description": "ID of the source"
+        },
+        {
+            "name": "year",
+            "dtype": "int",
+            "description": "Year of publication (?) of the source"
+        },
+        {
+            "name": "editor",
+            "dtype": "str",
+            "description": "Editor of the source"
+        },
+        {
+            "name": "title",
+            "dtype": "str",
+            "description": "Title"
+        },
+        {
+            "name": "description",
+            "dtype": "str",
+            "description": "Description of the source"
+        },
+        {
+            "name": "caption",
+            "dtype": "str",
+            "description": "Caption (usually with credits) shown above the source images."
+        },
+        {
+            "name": "pages",
+            "dtype": "str",
+            "description": "List of pages in the source"
+        }
+    ],
+    "chant_sources": [
+        {
+            "name": "chant_id",
+            "dtype": "int",
+            "description": "ID of the chant"
+        },
+        {
+            "name": "source",
+            "dtype": "int",
+            "description": "ID of the source"
+        },
+        {
+            "name": "page_id",
+            "dtype": "str",
+            "description": "Page id. Can be a page number or e.g. `[125], 125**`"
+        },
+        {
+            "name": "sequence",
+            "dtype": "int",
+            "description": "Order on the page"
+        },
+        {
+            "name": "extent",
+            "dtype": "int",
+            "description": "The number of pages the chant spans."
+        }
+    ]
+}
