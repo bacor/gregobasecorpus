@@ -45,7 +45,7 @@ The GABC files contain standard header fields (name, mode, office-part, etc.), b
 | `office-part`    | The office part: the liturgical genre of the chant.    |
 | `mode `          | Mode of the chant; see below.                          |
 | `transcriber`    | Who transcribed the chant                              |
-| `gabc-copyright` | always CC0 chants in the GregoBase Corpus              |
+| `gabc-copyright` | always CC0 for chants in the GregoBase Corpus          |
 | `_gregobase_id`  | the id of the chant                                    |
 | `_gregobase_url` | url to the gregobase webpage for the chant             |
 | `_gregobasecorpus_version` | version of the GregoBase Corpus (should be `{version}`) |
