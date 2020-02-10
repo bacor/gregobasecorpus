@@ -8,6 +8,7 @@ __pycache__
 gabc
 csv
 _tmp*/
+dist/
 
 # Documentation
 docs/_build
