@@ -2,7 +2,7 @@ Generating the corpus
 =====================
 
 Below you find instructions for generating the corpus.
-If you only want to use the corpus, just download one of the releases:
+If you just want to use the corpus, simply download one of the releases:
 you don't have to regenerate it yourself.
 
 Requirements
@@ -51,3 +51,10 @@ $ python generate_corpus.py \
 
 The `--date` argument is the date at which the SQL dump was generated. This can be
 found in the SQL file. (We could also extract it automatically, but this is easier).
+
+License
+-------
+
+The code for generating the corpus is released under an MIT license; see `src/LICENCE`.
+Note that the GregoBase Corpus itself (that is, the collection of `.gabc` and `.csv` 
+files) is released under a different license (CC0).
