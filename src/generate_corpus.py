@@ -1,6 +1,13 @@
+###
+# Author: Bas Cornelissen
+# Date: February 2020
+
+###
+"""
+Generate the GregoBase Corpus.
+"""
 import pymysql
 import random
-import subprocess
 import os
 import pandas as pd
 import shutil
