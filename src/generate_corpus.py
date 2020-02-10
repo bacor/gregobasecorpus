@@ -15,7 +15,7 @@ import json
 import datetime
 
 # GregoBase Corpus version
-__version__ = '0.4'
+__version__ = '0.1'
 
 # Directories
 SRC_DIR = os.path.dirname(__file__)
