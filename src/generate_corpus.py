@@ -15,7 +15,7 @@ import json
 import datetime
 
 # GregoBase Corpus version
-__version__ = '0.1'
+__version__ = '0.2'
 
 # Directories
 SRC_DIR = os.path.dirname(__file__)
@@ -343,6 +343,7 @@ class ReadmeWriter(object):
         self.tags = pd.read_csv(tags_fn, index_col=0)
 
     def table_structure(self, table_name):
+        columns_to_report = []
         lines = []
         lines.append('| Column       | Type | Description                                        |')
         lines.append('|--------------|------|----------------------------------------------------|')
@@ -351,6 +352,53 @@ class ReadmeWriter(object):
             dtype = column['dtype']
             description = column['description']
             lines.append(f'| {name: <12} | {dtype: <4} | {description: <50} |')
+
+        for column in self.db_structure[table_name]:
+            if not 'report_value_counts' in column:
+                continue
+            table = getattr(self, table_name)
+            column_name = column['name']
+            value_counts = pd.value_counts(table[column_name])
+            value_descriptions = column.get('value_descriptions', {})
+            title = f'#### Values of `{table_name}.{column_name}`\n'
+            if 'value_description_table' in column:
+                value_descriptions = getattr(self, column['value_description_table'])
+                title = f'#### Frequencies of `{table_name}.{column_name}` values\n'
+
+            lines.append('')
+            lines.append(title)
+            lines.append('| Value        | Count | Perc. | Description                              |')
+            lines.append('|--------------|------:|------:|------------------------------------------|')
+
+            others_count = 0
+            other_values = []
+            min_freq = column.get('report_min_freq', 0)
+            for value, count in value_counts.iteritems():
+                perc = count / len(table) * 100
+
+                if perc <= min_freq:
+                    others_count += count
+                    if 'value_description_table' in column:
+                        template = column['value_description_template']
+                        description = template.format(description=value_descriptions.loc[value, :])
+                        other_values.append(f'`{description}`')
+                    else:
+                        other_values.append(f'`{value}`')
+                    continue
+
+                if 'value_description_table' in column:
+                    template = column['value_description_template']
+                    description = template.format(description=value_descriptions.loc[value, :])
+                else:
+                    description = value_descriptions.get(value, '')
+                lines.append(f'| {value: <12} | {count: >5} | {perc: >4.0f}% | {description: <40} |')
+            
+            if others_count > 0:
+                perc = others_count / len(table) * 100
+                values = ", ".join(other_values)
+                lines.append(f'| *others*     | {others_count: >5} | {perc: >4.0f}% | {values} |')
+
+
         return '\n'.join(lines)
 
     def write_readme(self, gregobase_export_date="?"):
@@ -405,7 +453,7 @@ def main():
     compress_output()
 
 if __name__ == '__main__':
-    main()
+    # main()
     
     # converter = GregoBaseConverter()
     # converter.convert('../gregobase_dumps/gregobase_20191024.sql')
@@ -413,7 +461,7 @@ if __name__ == '__main__':
     # gabc = GABCConverter()
     # gabc.convert()
 
-    # writer = ReadmeWriter()
-    # writer.write_readme()
+    writer = ReadmeWriter()
+    writer.write_readme()
 
     

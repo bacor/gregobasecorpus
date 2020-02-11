@@ -69,29 +69,29 @@ values are present in GregoBase:
 Tables
 ------
 
-### `chants.csv`
+### Table `chants.csv`
 
 Table of chants with all their properties (see also [these desriptions of the fields](https://gregobase.selapa.net/?page_id=18)).
 
 {chants_structure}
 
-### `chant_sources.csv`
+### Table `chant_sources.csv`
 
 {chant_sources_structure}
 
-### `chant_tags.csv`
+### Table `chant_tags.csv`
 
 This table lists the tags associated to every chant. If a chant has
 multiple tags, there will be multiple rows in this table with the same `chant_id` (and of course different `tag_id`s).
 
 {chant_tags_structure}
 
-### `tags.csv`
+### Table `tags.csv`
 
 Tag names
 
 {tags_structure}
 
-### `sources.csv`
+### Table `sources.csv`
 
 {sources_structure}

@@ -8,7 +8,11 @@
         {
             "name": "tag_id",
             "dtype": "str",
-            "description": "ID of a tag"
+            "description": "ID of a tag",
+            "report_value_counts": true,
+            "report_min_freq": 1,
+            "value_description_table": "tags",
+            "value_description_template": "{description.tag}"
         }
     ],
     "chants": [
@@ -40,17 +44,52 @@
         {
             "name": "office_part",
             "dtype": "str",
-            "description": "Usage; also called office part."
+            "description": "Usage or office part, using a two-letter abbreviation (see values)",
+            "report_value_counts": true,
+            "value_descriptions": {
+                "an": "antiphona",
+                "hy": "hymnus",
+                "al": "alleluia",
+                "in": "introitus",
+                "co": "communio",
+                "re": "responsorium",
+                "of": "offertorium",
+                "gr": "graduale",
+                "rb": "responsorium brevis",
+                "ky": "kyriale",
+                "tr": "tractus",
+                "va": "varia",
+                "or": "toni communes",
+                "pr": "praefationes",
+                "ps": "psalmus",
+                "se": "sequentia",
+                "ca": "canticum",
+                "im": "improperia"            
+            }
         },
         {
             "name": "mode",
             "dtype": "str",
-            "description": "Mode of the chant. Should be a number or “p” for the “Tonus Peregrinus”."
+            "description": "Mode of the chant. Should be a number or “p” for the “Tonus Peregrinus” (see values).",
+            "report_value_counts": true,
+            "value_descriptions": {
+                "1": "dorian authentic",
+                "2": "dorian plagal or hypodorian",
+                "3": "phrygian authentic",
+                "4": "phrygian plagal or hypophrygian",
+                "5": "lydian authentic",
+                "6": "lydian plagal or hypolydian",
+                "7": "mixolydian authentic",
+                "8": "mixolydian plagal or hypomixolydian",
+                "p": "tonus peregrinus"
+            }
         },
         {
             "name": "mode_var",
             "dtype": "str",
-            "description": "This field contains more mode information; presumably the ending, as the GregoBase site writes: 'the “ending” field is used to put the ending according to Solesmes classification.'"
+            "description": "This field contains more mode information; presumably the ending, as the GregoBase site writes: 'the “ending” field is used to put the ending according to Solesmes classification.'",
+            "report_value_counts": true,
+            "report_min_freq": 0.5
         },
         {
             "name": "transcriber",
@@ -141,7 +180,11 @@
         {
             "name": "source",
             "dtype": "int",
-            "description": "ID of the source"
+            "description": "ID of the source",
+            "report_value_counts": true,
+            "report_min_freq": 2,
+            "value_description_table": "sources",
+            "value_description_template": "{description.title} ({description.year})"
         },
         {
             "name": "page_id",
