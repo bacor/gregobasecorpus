@@ -13,9 +13,12 @@ import pandas as pd
 import shutil
 import json
 import datetime
+import logging
+from music21 import converter
+import chant21
 
 # GregoBase Corpus version
-__version__ = '0.2'
+__version__ = '0.3'
 
 # Directories
 SRC_DIR = os.path.dirname(__file__)
@@ -24,6 +27,7 @@ DIST_DIR = os.path.join(ROOT_DIR, 'dist')
 OUTPUT_DIR = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
 CSV_DIR = os.path.join(OUTPUT_DIR, 'csv')
 GABC_DIR = os.path.join(OUTPUT_DIR, 'gabc')
+HTML_DIR = os.path.join(OUTPUT_DIR, 'html')        
 
 # Load database structure
 db_structure_fn = os.path.join(SRC_DIR, 'db_structure.json')
@@ -39,17 +43,16 @@ def random_id(length=5):
 
 def compress_corpus():
     """Compress the output directory, and put the archive inside it."""
-    # Compress
     archive_fn = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
     shutil.make_archive(archive_fn, 'zip', OUTPUT_DIR)
-    # Move archive
     source_fn = f'{archive_fn}.zip'
     target_fn = os.path.join(OUTPUT_DIR, f'gregobasecorpus-v{__version__}.zip')
+    logging.info(f"Compressing the corpus: '{os.path.relpath(target_fn, start=OUTPUT_DIR)}")
     os.rename(source_fn, target_fn)
 
 ##
 
-class GregoBaseConverter(object):
+class SQLConverter(object):
 
     field_delimiter = '@'
     """str: delimiter used in the temporary csv file"""
@@ -68,23 +71,24 @@ class GregoBaseConverter(object):
 
         # Set up directories
         self.tmp_dir = os.path.join(OUTPUT_DIR, 'tmp')
-
-        # Clear 
-        if os.path.exists(OUTPUT_DIR):
-            shutil.rmtree(OUTPUT_DIR)
         for dir_path in [CSV_DIR, self.tmp_dir]:
             if not os.path.exists(dir_path):
+                logging.info(f"Creating directory: '{os.path.relpath(dir_path, start=OUTPUT_DIR)}'")
                 os.makedirs(dir_path)
 
         self.db_structure = db_structure
 
     def create_db(self):
+        logging.info(f"Creating temporary database '{self.db_name}'")
         return self.cursor.execute(f'CREATE DATABASE {self.db_name};')
 
     def delete_db(self):
+        logging.info(f"Deleting temporary database '{self.db_name}'")
         return self.cursor.execute(f'DROP DATABASE {self.db_name};')
 
     def import_sql(self, filepath):
+        rel_path = os.path.relpath(filepath, start=OUTPUT_DIR)
+        logging.info(f"Importing sql file into database: '{rel_path}'")
         mysql = f'mysql --host={self.db_host} --user={self.db_user} --password={self.db_pass}'
         command = f'{mysql} {self.db_name} < {filepath}'
         os.system(command)
@@ -98,13 +102,15 @@ class GregoBaseConverter(object):
         self.cursor.execute(f'USE {self.db_name};')
         for table_name in self.db_structure.keys():
             # Export db table to temporary csv file
-            tmp_filepath = os.path.join(self.tmp_dir, f'{table_name}.csv')
+            tmp_fn = os.path.join(self.tmp_dir, f'{table_name}.csv')
+            target_fn = os.path.join(CSV_DIR, f'{table_name}.csv')
+            logging.info(f"Exporting table '{table_name}' to temporary file '{os.path.relpath(target_fn, start=OUTPUT_DIR)}'")
             statement = (
                 "SELECT * from {db_prefix}{table_name} INTO OUTFILE '{filepath}' "
                 "FIELDS OPTIONALLY ENCLOSED BY '{delimiter}' "
                 "TERMINATED BY ',' "
                 "LINES TERMINATED BY '\n'"
-                ).format(filepath=tmp_filepath, 
+                ).format(filepath=tmp_fn, 
                          table_name=table_name, 
                          delimiter=self.field_delimiter,
                          db_prefix=self.db_prefix)
@@ -116,7 +122,7 @@ class GregoBaseConverter(object):
             dtype_map = { 'str': str, 'int': int }
             dtypes = { col['name']: dtype_map[col['dtype']] for col in columns }
             names = [ col['name'] for col in columns ]
-            df = pd.read_csv(tmp_filepath,
+            df = pd.read_csv(tmp_fn,
                             names=names, 
                             dtype=dtypes,
                             sep=',', 
@@ -126,13 +132,14 @@ class GregoBaseConverter(object):
                             index_col=0,
                             engine='python')
 
-            target_fn = os.path.join(CSV_DIR, f'{table_name}.csv')
             df.to_csv(target_fn)
 
         # Remove temporary directory
+        rel_tmp_dir = os.path.relpath(self.tmp_dir, start=OUTPUT_DIR)
+        logging.info(f"Removing temporary directory '{rel_tmp_dir}'")
         shutil.rmtree(self.tmp_dir)
 
-    def convert(self, filepath):
+    def convert_to_csv(self, filepath):
         """Convert a sql dump of GregoBase into a set of CSV files
         
         Args:
@@ -145,7 +152,7 @@ class GregoBaseConverter(object):
 
 ##
 
-class GABCConverter(object):
+class CSVConverter(object):
     def __init__(self, db_structure=DB_STRUCTURE):
         """"""
         self.db_structure = db_structure
@@ -153,6 +160,8 @@ class GABCConverter(object):
         # Set up output directories
         if not os.path.exists(GABC_DIR):
             os.makedirs(GABC_DIR)
+        if not os.path.exists(HTML_DIR):
+            os.makedirs(HTML_DIR)
         if not os.path.exists(CSV_DIR):
             raise Exception('CSV directory not found')
 
@@ -200,14 +209,14 @@ class GABCConverter(object):
         elif chant.gabc.startswith('"') and chant.gabc.endswith('"'):
             gabc = chant.gabc[1:len(chant.gabc)-1]
         else:
-            print(f'Skipping {chant.name}: cannot find gabc')
+            logging.error(f'Cannot find GABC of chant {chant.name}; skipping...')
             return False
 
         # First encode to bytes, then decode, also the escaped unicode chars:
         try:
             gabc = gabc.encode('latin1').decode('unicode-escape')
         except:
-            print(f'Skipping {chant.name}: cannot be converted to utf-8')
+            logging.error(f'Cannot convert GABC to utf-8 for chant {chant.name}; skipping...')
             return False
 
         if not pd.isnull(chant['gabc_verses']):
@@ -286,35 +295,58 @@ class GABCConverter(object):
 
         return metadata
 
-    def convert(self, filename='{idx:0>5}.gabc'):
-        """Exports all chants to GABC files.
-
-        The header of the gabc file contains a lot of metadata, see 
-        :func:`collect_metadata` for details.
-        
-        Args:
-            chants (pd.DataFrame): The chants table
-            chant_tags (pd.DataFrame): The chant_tags table (chant_tags.csv)
-            chant_sources (pd.DataFrame): The chant_sources table (chant_sources.csv)
-            sources (pd.DataFrame): The sources table (sources.csv)
-            tags (pd.DataFrame): The tags table (tags.csv)
-            filepath (str, optional): A formattable string for the gabc files to output.
-                Defaults to 'gabc/{idx:0>5}.gabc'.
-        """
-        
+    def convert_to_gabc(self):
+        """Exports all chants to GABC files."""
+        logging.info('Exporting chants to GABC files...')
         for idx, chant in self.chants.iterrows():
             body = self.extract_gabc_body(idx)
             if body is not False:
                 metadata = self.collect_metadata(idx)
-                filepath = os.path.join(GABC_DIR, filename.format(idx=idx))
-
-                with open(filepath, 'w') as handle:
+                gabc_path = os.path.join(GABC_DIR, f'{idx:0>5}.gabc')
+                
+                with open(gabc_path, 'w') as handle:
                     for key, value in metadata.items():
                         attribute = f'{key}:{value};\n'
                         handle.write(attribute)        
                     handle.write("%%\n")
                     handle.write(body)
 
+class GABCConverter(object):
+    def __init__(self):
+        """"""
+        # Set up output directories
+        if not os.path.exists(GABC_DIR):
+            raise Exception('GABC directory not found')
+        if not os.path.exists(CSV_DIR):
+            raise Exception('CSV directory not found')
+        if not os.path.exists(HTML_DIR):
+            os.makedirs(HTML_DIR)
+
+        # Load all csv files
+        chants_fn = os.path.join(CSV_DIR, 'chants.csv')
+        self.chants = pd.read_csv(chants_fn, index_col=0)
+
+    def convert_to_html(self):
+        logging.info('Exporting chants to HTML files...')
+        for idx, chant in self.chants.iterrows():
+            gabc_path = os.path.join(GABC_DIR, f'{idx:0>5}.gabc')
+            html_path = os.path.join(HTML_DIR, f'{idx:0>5}.html')
+
+            if not os.path.exists(gabc_path):
+                logging.error(f'GABC file not found: {os.path.relpath(gabc_path, start=OUTPUT_DIR)}')
+                continue
+            
+            try:
+                chant = converter.parse(gabc_path,
+                    format='gabc', forceSource=True, storePickle=False)
+            except Exception as e:
+                logging.error(f"Chant {idx} could not be parsed: {e}")
+                logging.error(f">  Removing unparsable GABC file '{os.path.relpath(gabc_path, start=OUTPUT_DIR)}'")
+                os.remove(gabc_path)
+                continue
+
+            chant.toHTML(html_path)
+        
 ##
 
 class ReadmeWriter(object):
@@ -419,6 +451,7 @@ class ReadmeWriter(object):
     def write_readme(self, gregobase_export_date="?"):
         """Write the README for a release of the GregoBase Corpus using the 
         template file `readme_template.md`."""
+        logging.info('Writing README file...')
         now = datetime.datetime.now()
         corpus_date = now.strftime("%d %B %Y")
         num_gabc_files = len([f for f in os.listdir(GABC_DIR) 
@@ -434,7 +467,7 @@ class ReadmeWriter(object):
             'gregobase_export_date': gregobase_export_date,
             'num_gabc_files': num_gabc_files,
             'num_chants': len(self.chants),
-            'num_unconverted': len(self.chants) - num_gabc_files,
+            'num_excluded': len(self.chants) - num_gabc_files,
             'num_sources': len(self.sources),
             'num_tags': len(self.tags),
             'corpus_date': corpus_date,
@@ -460,25 +493,50 @@ def main():
                         help='the date on which gregobase was exported (you can find this in the sql file)')   
     args = parser.parse_args()
 
+    # Clear output_dir before starting logging to that directory
+    if os.path.exists(OUTPUT_DIR):
+        shutil.rmtree(OUTPUT_DIR)
+    os.makedirs(OUTPUT_DIR)
+
+    # Set up logging
+    log_fn = os.path.join(OUTPUT_DIR, 'corpus-generation.log')
+    logging.basicConfig(filename=log_fn,
+                        filemode='w',
+                        format='%(levelname)s %(asctime)s %(message)s',
+                        datefmt='%d-%m-%y %H:%M:%S',
+                        level=logging.INFO)
+    logging.info(f'Start generating GregoBase Corpus v{__version__}')
+    logging.info(f"> Output directory: '{os.path.relpath(OUTPUT_DIR, start=ROOT_DIR)}'")
+
     # Go!
-    converter = GregoBaseConverter()
-    converter.convert(filepath=args.sql)
+    sql = SQLConverter()
+    sql.convert_to_csv(filepath=args.sql)
+
+    csv = CSVConverter()
+    csv.convert_to_gabc()
+    
     gabc = GABCConverter()
-    gabc.convert()
+    gabc.convert_to_html()
+
     writer = ReadmeWriter()
     writer.write_readme(gregobase_export_date=args.date)
+
     compress_corpus()
 
 if __name__ == '__main__':
     # main()
-    compress_corpus()
-    # converter = GregoBaseConverter()
-    # converter.convert('../gregobase_dumps/gregobase_20191024.sql')
 
+    # sql = SQLConverter()
+    # sql.convert_to_csv(filepath='../gregobase_dumps/gregobase_20191024.sql')
+
+    # csv = CSVConverter()
+    # csv.convert_to_gabc()
+    
     # gabc = GABCConverter()
-    # gabc.convert()
+    # gabc.convert_to_html()
 
-    # writer = ReadmeWriter()
-    # writer.write_readme()
+    writer = ReadmeWriter()
+    writer.write_readme(gregobase_export_date='24 October 2019')
+    compress_corpus()
 
     

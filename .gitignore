@@ -7,12 +7,14 @@ __pycache__
 tmp
 dist/*/csv
 dist/*/gabc
+dist/*/html
 
 # Documentation
 docs/_build
 
 # Development
 *-env
+env
 tmp
 .vscode
 .python-version
