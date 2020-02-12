@@ -12,7 +12,7 @@ toolkit for computational musicology, using the library `chant21`.
 |----------------------------------|----------------------|
 | GregoBase Corpus version         | 0.2                  |
 | Corpus generated on              | 12 February 2020     |
-| GregoBase exported on            | ?                    |
+| GregoBase exported on            | 24 October 2019      |
 | Number of chants in `chants.csv` | 9139                 |
 | Number of GABC files             | 9130                 |
 | Number of unconverted chants     | 9                   |
@@ -140,7 +140,7 @@ Table of chants with all their properties (see also [these desriptions of the fi
 | c            |    79 |    1% |                                          |
 | G            |    62 |    1% |                                          |
 | g2           |    52 |    1% |                                          |
-| *others*     |   437 |    5% | `VIII g`, `e`, `a2`, `d2`, `D`, `* a`, `A*`, `b`, `c2`, `et 5`, `E`, `*`, `I g`, `V a`, `A`, `III`, `VII c`, `d*`, `a*`, `Per.`, `C`, `G*`, `VII a`, `IV *`, `II d`, `F`, `g3`, `e*`, `a3`, `I a`, `IV e`, `d3`, `VIII a`, `* d`, `e2`, `II *d`, `VII c2`, `* c`, `D2`, `VIIC2`, `et 2`, `C2`, `VI f`, `?`, `* f`, `*a`, ` `, `VIII c`, `IV`, `Re`, `I f`, `c 2`, `II* d`, `A-star`, `VIII C`, `g4`, `IV g`, `a transp.`, `d transp`, `IV E`, `VI`, `D 2`, `G2`, `C transp.`, `VII g`, `g 3`, `1`, `a transpos.`, `g5`, `c Transpos`, `et 3`, `III `, `t. irreg`, `g 2`, `e *`, `E2`, `* e`, `a transpos`, `c transpos`, `irreg.` |
+| *others*     |   437 |    5% | `VIII g`, `e`, `a2`, `d2`, `D`, `* a`, `A*`, `b`, `c2`, `E`, `et 5`, `A`, `*`, `I g`, `V a`, `III`, `VII c`, `a*`, `d*`, `Per.`, `C`, `G*`, `VII a`, `d3`, `g3`, `a3`, `e*`, `I a`, `IV *`, `F`, `II d`, `IV e`, `?`, `C2`, `VIII a`, `* d`, `VIIC2`, `* c`, `et 2`, `VII c2`, `e2`, `VI f`, `*a`, `* f`, `II *d`, `D2`, `c 2`, `D 2`, `C transp.`, `* e`, `c Transpos`, `II* d`, `VIII C`, ` `, `a transpos.`, `g5`, `IV g`, `VI`, `VII g`, `a transpos`, `c transpos`, `E2`, `G2`, `g 2`, `III `, `e *`, `g 3`, `A-star`, `t. irreg`, `d transp`, `1`, `I f`, `g4`, `IV E`, `et 3`, `a transp.`, `irreg.`, `IV`, `Re`, `VIII c` |
 
 ### Table `chant_sources.csv`
 

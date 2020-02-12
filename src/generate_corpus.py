@@ -37,11 +37,15 @@ def random_id(length=5):
     chars = 'abcdefghijklmnopqrstuvwxyz1234567890'
     return ''.join(random.choice(chars) for _ in range(length))
 
-def compress_output(remove_dir=False):
+def compress_corpus():
+    """Compress the output directory, and put the archive inside it."""
+    # Compress
     archive_fn = os.path.join(DIST_DIR, f'gregobasecorpus-v{__version__}')
     shutil.make_archive(archive_fn, 'zip', OUTPUT_DIR)
-    if remove_dir:
-        shutil.rmtree(OUTPUT_DIR)
+    # Move archive
+    source_fn = f'{archive_fn}.zip'
+    target_fn = os.path.join(OUTPUT_DIR, f'gregobasecorpus-v{__version__}.zip')
+    os.rename(source_fn, target_fn)
 
 ##
 
@@ -463,18 +467,18 @@ def main():
     gabc.convert()
     writer = ReadmeWriter()
     writer.write_readme(gregobase_export_date=args.date)
-    compress_output()
+    compress_corpus()
 
 if __name__ == '__main__':
     # main()
-    
+    compress_corpus()
     # converter = GregoBaseConverter()
     # converter.convert('../gregobase_dumps/gregobase_20191024.sql')
 
     # gabc = GABCConverter()
     # gabc.convert()
 
-    writer = ReadmeWriter()
-    writer.write_readme()
+    # writer = ReadmeWriter()
+    # writer.write_readme()
 
     
