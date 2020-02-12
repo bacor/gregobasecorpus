@@ -239,29 +239,28 @@ class GABCConverter(object):
         - ``_gregobase_tag_{i}_name``: the name of the i-th tag
         """
         
-        chant = self.chants.loc[idx,:]
+        chant = self.chants.loc[idx,:].fillna('')
         metadata = {
-            'name': chant['incipit'],
-            'office_part': chant['office_part'],
-            'mode': chant['mode'],
-            'transcriber': chant['transcriber'],
-            'commentary': chant['commentary'],
-            'user-notes': chant['remarks'],
+            'name': chant.get('incipit'),
+            'office-part': chant.get('office_part'),
+            'mode': chant.get('mode'),
+            'transcriber': chant.get('transcriber'),
+            'commentary': chant.get('commentary'),
+            'user-notes': chant.get('remarks'),
             'gabc-copyright': 'CC0-1.0 <http://creativecommons.org/publicdomain/zero/1.0/>',
-            '_gregobase_url': f'https://gregobase.selapa.net/chant.php?id={idx}',
-            '_gregobase_id': idx,
             '_gregobase_corpus_version': __version__,
+            '_gregobase_id': idx,
+            '_gregobase_url': f'https://gregobase.selapa.net/chant.php?id={idx}',
+            '_gregobase_cantus_id': chant.get('cantus_id'),
+            '_gregobase_mode_var': chant.get('mode_var')
         }
-        
-        if not pd.isnull(chant['commentary']):
-            metadata['commentary'] = chant['commentary']
-        
-        if not pd.isnull(chant['cantus_id']):
-            metadata['_gregobase_cantus_id'] = chant['cantus_id']
-        
-        if not pd.isnull(chant['mode_var']):
-            metadata['_gregobase_mode_var'] = chant['mode_var']
 
+        # Delete empty fields
+        keys = list(metadata.keys())
+        for key in keys:
+            if metadata[key] == '':
+                del metadata[key]
+        
         # Add data about all sources the chant is found in
         source_ids = self.chant_sources.query(f'chant_id=={idx}')['source']
         if len(source_ids) > 0:
@@ -343,6 +342,8 @@ class ReadmeWriter(object):
         self.tags = pd.read_csv(tags_fn, index_col=0)
 
     def table_structure(self, table_name):
+        """Create a Markdown table describing the structure a database table:
+        the columns, what values they take, and so on."""
         columns_to_report = []
         lines = []
         lines.append('| Column       | Type | Description                                        |')
@@ -401,7 +402,19 @@ class ReadmeWriter(object):
 
         return '\n'.join(lines)
 
+    def get_changelog(self):
+        """Export the changes in changelog.csv as a markdown list"""
+        changelog = pd.read_csv(os.path.join(SRC_DIR, 'changelog.csv'))
+        new_changes = changelog.query(f'version=={__version__}')
+        lines = []
+        for i, (version, change) in new_changes.iterrows():
+            line = f'- {change}'
+            lines.append(line)
+        return '\n'.join(lines)
+
     def write_readme(self, gregobase_export_date="?"):
+        """Write the README for a release of the GregoBase Corpus using the 
+        template file `readme_template.md`."""
         now = datetime.datetime.now()
         corpus_date = now.strftime("%d %B %Y")
         num_gabc_files = len([f for f in os.listdir(GABC_DIR) 
@@ -417,9 +430,11 @@ class ReadmeWriter(object):
             'gregobase_export_date': gregobase_export_date,
             'num_gabc_files': num_gabc_files,
             'num_chants': len(self.chants),
+            'num_unconverted': len(self.chants) - num_gabc_files,
             'num_sources': len(self.sources),
             'num_tags': len(self.tags),
-            'corpus_date': corpus_date
+            'corpus_date': corpus_date,
+            'changelog': self.get_changelog()
         }
 
         with open(os.path.join(SRC_DIR, 'readme_template.md'), 'r') as handle:
@@ -435,13 +450,11 @@ class ReadmeWriter(object):
 def main():
     import argparse
     parser = argparse.ArgumentParser(description='Generate the GregoBase Corpus.')
-    parser.add_argument('--sql', type=str,
+    parser.add_argument('--sql', type=str, required=True,
                         help='path the gregobase database dump')
-    parser.add_argument('--date', type=str,
+    parser.add_argument('--date', type=str, required=True,
                         help='the date on which gregobase was exported (you can find this in the sql file)')   
     args = parser.parse_args()
-
-
 
     # Go!
     converter = GregoBaseConverter()

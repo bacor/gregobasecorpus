@@ -5,7 +5,9 @@ __pycache__
 
 # Data
 tmp
-dist/
+dist/*/csv
+dist/*/gabc
+dist/*.zip
 
 # Documentation
 docs/_build

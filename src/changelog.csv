@@ -1,0 +1,4 @@
+version,changes
+0.2,"Added value-frequencies for certain fields (office-part, mode, sources, tags) to README."
+0.2,"Improve GABC headers: only include non-empty metadata fields"
+0.2,"Add changelog to README"
