@@ -7,9 +7,6 @@ __pycache__
 tmp
 dist
 
-# Documentation
-docs/_build
-
 # Development
 *-env
 env
