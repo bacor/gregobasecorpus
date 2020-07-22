@@ -8,17 +8,9 @@ large database of chant transcriptions in the
 This format can be loaded into [music21](https://web.mit.edu/music21/), a Python
 toolkit for computational musicology, using the library `chant21`.
 
-Usage
------
+[**> Download the latest release of the GregoBaseCorpus**](https://github.com/bacor/gregobasecorpus/releases/latest)
 
-TODO: example of using the corpus with chant21
-
-Versions
---------
-
-Since new transcriptions are regularly added to GregoBase, we plan to release
-new versions of the corpus as well. All releases can be downloaded from GitHub
-and can be referenced using Zenodo DOI.
+[> Read more about the corpus](https://github.com/bacor/gregobasecorpus/tree/master/docs)
 
 Licence
 -------
