@@ -52,6 +52,24 @@ $ python generate_corpus.py \
 The `--date` argument is the date at which the SQL dump was generated. This can be
 found in the SQL file. (We could also extract it automatically, but this is easier).
 
+Possible issues
+---------------
+
+The way the MySQL database is used can give rise to some issues. In particular, 
+the tables cannot be exported when the MySQL server is running with the 
+`--secure-file-priv` option enabled. You can check whether this is enabled
+by running `mysql> SHOW VARIABLES LIKE "securefilepriv";`. 
+You can (temporarily) disable the option in your configuration file: add
+
+```
+[mysqld]
+
+secure_file_priv = ''
+```
+
+to `~/.my.cnf`, restart mysql using `$ mysql.server restart`, and try agian.
+(See also [here](https://medium.com/@andrewpongco/solving-the-mysql-server-is-running-with-the-secure-file-priv-option-so-it-cannot-execute-this-d319de864285) or [here](https://dba.stackexchange.com/questions/123290/error-secure-file-priv-option-when-save-selection-to-csv).)
+
 License
 -------
 
