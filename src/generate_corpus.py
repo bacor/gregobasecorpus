@@ -156,7 +156,20 @@ class SQLConverter(object):
         """
         self.create_db()
         self.import_sql(filepath)
-        self.export_tables()
+        try:
+            self.export_tables()
+        except pymysql.err.InternalError as e:
+            if e.args[0] == 1290:
+                raise Exception(
+                    'Cannot export the MySQL tables because your MySQL server '
+                    'is running with the --secure-file-priv option. A possible '
+                    'solution is (temporarily) disabling the option in your '
+                    '`~/.my.cnf` file and then restarting mysql. This is also '
+                    'explained in the file `src/README.md` in the '
+                    'GregoBaseCorpus repository.'
+                )
+            else:
+                raise e
         self.delete_db()
 
 ##
