@@ -6,7 +6,8 @@ It is a research-friendly version of [GregoBase](gregobase.selapa.net/), a
 large database of chant transcriptions in the
 [GABC format](https://gregorio-project.github.io/gabc/index.html).
 This format can be loaded into [music21](https://web.mit.edu/music21/), a Python
-toolkit for computational musicology, using the library `chant21`.
+toolkit for computational musicology, using the library 
+[`chant21`](github.com/bacor/chant21).
 
 | Summary                          |                      |
 |----------------------------------|----------------------|
@@ -15,7 +16,7 @@ toolkit for computational musicology, using the library `chant21`.
 | GregoBase exported on            | {gregobase_export_date: <20} |
 | Number of chants in `chants.csv` | {num_chants: <20} |
 | Number of GABC files             | {num_gabc_files: <20} |
-| Number of excluded chants        | {num_excluded: <20} |
+| Number of unconvertable chants   | {num_unconvertable: <20} |
 | Number of sources                | {num_sources: <20} |
 | Number of tags                   | {num_tags: <20} |
 
@@ -74,9 +75,13 @@ for notating chants: you type text, but it looks like sheet music.
 Volpiano can be downloaded from [fawe.de/volpiano](http://www.fawe.de/volpiano/).
 Without Volpiano installed, the music will display as weird looking text of the
 form `1---dfg-g---`.
+
 The HTML files also show the structure of the GABC file: its division in sections, words,
 syllables (and although quite inacurate, neumes). It moreover lists all metadata.
-Note that no HTML file is included for for chants that cannot be converted by chant21.
+Note that no HTML file is included for for chants that cannot be converted by 
+chant21 (in this release, {num_unconvertable} chants were not convertable).
+Also note chant21 only extracts neume boundaries that are explicitly marked in 
+the gabc, and so many might be missing.
 
 Tables
 ------
