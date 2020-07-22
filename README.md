@@ -13,6 +13,9 @@ toolkit for computational musicology, using the library
 
 [> Read more about the corpus](https://github.com/bacor/gregobasecorpus/tree/master/docs)
 
+> Check out [chant21](https://github.com/bacor/chant21/) and the
+[CantusCorpus](https://github.com/bacor/cantuscorpus/), a related plainchant corpus.
+
 Licence
 -------
 
