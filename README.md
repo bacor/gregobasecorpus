@@ -1,7 +1,7 @@
-GregoBase Corpus
-================
+GregoBaseCorpus
+===============
 
-The GregoBase Corpus is a corpus of Gregorian chant for computational musicology.
+The GregoBaseCorpus is a corpus of Gregorian chant for computational musicology.
 It is a research-friendly version of [GregoBase](gregobase.selapa.net/), a
 large database of chant transcriptions in the
 [GABC format](https://gregorio-project.github.io/gabc/index.html).
@@ -15,7 +15,7 @@ toolkit for computational musicology, using the library `chant21`.
 Licence
 -------
 
-The GregoBase Corpus (the collection of `.gabc` and `.csv` files)
+The GregoBaseCorpus (the collection of `.gabc` and `.csv` files)
 is released under a [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/)
 license, just like [GregoBase itself](https://gregobase.selapa.net/?page_id=2]).
 The Python code used to generate the corpus (that is, the code in the `src/`

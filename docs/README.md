@@ -1,7 +1,7 @@
-GregoBase Corpus v0.4
+GregoBaseCorpus v0.4
 ===========================
 
-The GregoBase Corpus is a corpus of Gregorian chant for computational musicology.
+The GregoBaseCorpus is a corpus of Gregorian chant for computational musicology.
 It is a research-friendly version of [GregoBase](https://gregobase.selapa.net/), a
 large database of chant transcriptions in the
 [GABC format](https://gregorio-project.github.io/gabc/index.html).

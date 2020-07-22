@@ -1,4 +1,4 @@
-GregoBase Corpus v{version}
+GregoBaseCorpus v{version}
 ===========================
 
 The GregoBase Corpus is a corpus of Gregorian chant for computational musicology.
