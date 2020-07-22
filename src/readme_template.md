@@ -74,14 +74,9 @@ for notating chants: you type text, but it looks like sheet music.
 Volpiano can be downloaded from [fawe.de/volpiano](http://www.fawe.de/volpiano/).
 Without Volpiano installed, the music will display as weird looking text of the
 form `1---dfg-g---`.
-
 The HTML files also show the structure of the GABC file: its division in sections, words,
 syllables (and although quite inacurate, neumes). It moreover lists all metadata.
-
-Finally, while generating the HTML files, we remove all GABC files that cannot be
-parsed by chant21. We do this to ensure that the final corpus can be analysed using
-chant21 and music21. (The number of chants excluded in version {version} is {num_excluded};
-see also the summary above.)
+Note that no HTML file is included for for chants that cannot be converted by chant21.
 
 Tables
 ------
@@ -91,7 +86,7 @@ The corpus also contains the unprocessed GregoBase database, in an easily access
 
 ### Table `chants.csv`
 
-Table of chants with all their properties (see also [these desriptions of the fields](https://gregobase.selapa.net/?page_id=18)).
+Table of chants with all their properties (see also [these descriptions of the fields](https://gregobase.selapa.net/?page_id=18)).
 
 {chants_structure}
 
