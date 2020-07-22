@@ -5,3 +5,7 @@ version,changes
 0.3,"Add HTML previews"
 0.3,"Exclude unparsable GABC files from corpus"
 0.3,"Log errors during corpus generation"
+0.4,"Require the latest version of chant21 (>=0.4.5)"
+0.4,"No longer include the zip files of the releases in the repository, as those are available as GitHub releases."
+0.4,"Copies of the READMEs of all past releases are kept in `versions/` for easy reference."
+0.4,"Do not exclude chants that cannot be parsed by chant21: new releases of chant21 might be able to parse previously unconvertable chants"
