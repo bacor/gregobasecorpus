@@ -547,10 +547,10 @@ def main():
     compress_corpus()
 
 if __name__ == '__main__':
-    # main()
+    main()
 
     # sql = SQLConverter()
-    # sql.convert_to_csv(filepath='gregobase_dumps/gregobase_20191024.sql')
+    # sql.convert_to_csv(filepath='../gregobase_dumps/gregobase_20191024.sql')
 
     # csv = CSVConverter()
     # csv.convert_to_gabc()
@@ -558,8 +558,8 @@ if __name__ == '__main__':
     # gabc = GABCConverter()
     # gabc.convert_to_html()
 
-    writer = ReadmeWriter()
-    writer.write_readme(gregobase_export_date='24 October 2019')
+    # writer = ReadmeWriter()
+    # writer.write_readme(gregobase_export_date='24 October 2019')
     # compress_corpus()
 
     
