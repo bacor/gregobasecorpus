@@ -26,6 +26,5 @@ Generating the corpus
 
 The GregoBase Corpus is created automatically from database dumps of GregoBase.
 If you just want to use the corpus, you don't have to regenerate it yourself:
-simply download one of the releases and you're good to go.
-But if you want to regenerate the corpus yourself, you can of course do so.
-All code and some instructions are available in the `src` directory.
+simply download [the latest release](https://github.com/bacor/gregobasecorpus/releases/latest) and you're good to go. But if you want to regenerate the corpus yourself, 
+you can of course do so: [read on...](https://github.com/bacor/gregobasecorpus/tree/master/src).
