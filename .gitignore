@@ -12,4 +12,3 @@ dist
 env
 tmp
 .vscode
-.python-version

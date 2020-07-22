@@ -22,9 +22,25 @@ Requirements
     `Can't connect to local MySQL server through socket`, your server is
     probably not running. Start it using ``mysql.server start``.
 
-* **Python with pandas**
-    The postprocessing of the csv files is done using Pandas.
-    You can install it using `pip install pandas`.
+* **Python.**
+    The corpus is generated using a Python script. You can find the Python 
+    version used in `.python-version` and the dependencies in 
+    `requirements.txt`. If you use `pyenv` and `venv` to manage 
+    python versions and virtual environments:
+
+    ```bash
+    # Install the right python version
+    pyenv install | cat .python-version
+
+    # Create a virtual environment
+    python -m venv env
+
+    # Activate the environment
+    source env/bin/activate
+
+    # Install dependencies
+    pip install -r requirements.txt
+    ```
 
 Overview
 --------
