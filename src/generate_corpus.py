@@ -18,7 +18,7 @@ from music21 import converter
 import chant21
 
 # GregoBase Corpus version
-__version__ = '0.3'
+__version__ = '0.4'
 
 # Directories
 SRC_DIR = os.path.dirname(__file__)
@@ -66,7 +66,16 @@ class SQLConverter(object):
         self.db_pass = db_pass
         self.db_prefix = db_prefix
         self.db_name = f'tmp_db_gregocorpus_{random_id()}'
-        self.db = pymysql.connect(host=db_host, user=db_user, password=db_pass)
+        try:
+            self.db = pymysql.connect(host=db_host, user=db_user, password=db_pass)
+        except:
+            raise Exception(
+                'Could not connect to the mysql database. Are you sure mysql '
+                'is running? You can check this by running `mysql -uroot` '
+                'which opens mysql (close it using `exit`). If mysql is not '
+                'running, start it using `mysql.server start`.'
+            )
+
         self.cursor = self.db.cursor()
 
         # Set up directories
