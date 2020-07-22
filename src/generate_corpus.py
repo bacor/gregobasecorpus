@@ -363,8 +363,6 @@ class GABCConverter(object):
                     format='gabc', forceSource=True, storePickle=False)
             except Exception as e:
                 logging.error(f"Chant {idx} could not be parsed: {e}")
-                logging.error(f">  Removing unparsable GABC file '{os.path.relpath(gabc_path, start=OUTPUT_DIR)}'")
-                os.remove(gabc_path)
                 continue
 
             chant.toHTML(html_path)
@@ -478,6 +476,8 @@ class ReadmeWriter(object):
         corpus_date = now.strftime("%d %B %Y")
         num_gabc_files = len([f for f in os.listdir(GABC_DIR) 
             if os.path.isfile(os.path.join(GABC_DIR,f))])
+        num_html_files = len([f for f in os.listdir(HTML_DIR) 
+            if os.path.isfile(os.path.join(HTML_DIR,f))])
 
         template_kws = {
             'version': __version__,
@@ -488,8 +488,9 @@ class ReadmeWriter(object):
             'sources_structure': self.table_structure('sources'),
             'gregobase_export_date': gregobase_export_date,
             'num_gabc_files': num_gabc_files,
+            'num_html_files': num_html_files,
             'num_chants': len(self.chants),
-            'num_excluded': len(self.chants) - num_gabc_files,
+            'num_unconvertable': len(self.chants) - num_html_files,
             'num_sources': len(self.sources),
             'num_tags': len(self.tags),
             'corpus_date': corpus_date,
@@ -546,10 +547,10 @@ def main():
     compress_corpus()
 
 if __name__ == '__main__':
-    main()
+    # main()
 
     # sql = SQLConverter()
-    # sql.convert_to_csv(filepath='../gregobase_dumps/gregobase_20191024.sql')
+    # sql.convert_to_csv(filepath='gregobase_dumps/gregobase_20191024.sql')
 
     # csv = CSVConverter()
     # csv.convert_to_gabc()
@@ -557,8 +558,8 @@ if __name__ == '__main__':
     # gabc = GABCConverter()
     # gabc.convert_to_html()
 
-    # writer = ReadmeWriter()
-    # writer.write_readme(gregobase_export_date='24 October 2019')
+    writer = ReadmeWriter()
+    writer.write_readme(gregobase_export_date='24 October 2019')
     # compress_corpus()
 
     
